@@ -1,0 +1,4 @@
+[acs.repo]
+baseurl=http://www.zeuthen.desy.de/~wiesand/ACS/repo/SL/7/x86_64
+gpgcheck=0
+enabled=1
