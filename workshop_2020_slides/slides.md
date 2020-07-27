@@ -51,7 +51,8 @@ At the *same place* provide information on how to report any issues.
 
 ## Current state
 
-I have pieced together something, from `Dockerfile`s I was given when I started.
+What I show here is heavily based on an ACS Dockerfile taken from LST,
+where it is used for the Telescope Control Unit
 
 <https://github.com/dneise/acs_test>
 
