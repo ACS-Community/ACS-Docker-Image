@@ -1,28 +1,63 @@
 FROM centos:7
 
 RUN yum update -y
+RUN yum install -y deltarpm
+
+RUN yum update -y
 
 RUN yum install -y \
+  autoconf \
+  bison \
+  bzip2 bzip2-devel \
+  curl \
+  dos2unix \
+  emacs \
+  epel-release \
+  expat-devel \
+  file \
+  flex \
+  freetype-devel \
   gcc \
   gcc-c++ \
   gcc-gfortran \
   git \
-  subversion \
-  autoconf \
-  ksh tree \
+  ksh \
+  libffi-devel \
+  libX11-devel \
+  libxml2-devel \
+  libxslt-devel \
   make \
-  patch \
-  wget \
-  curl \
   mc \
   nc \
-  java-1.8.0-openjdk java-1.8.0-openjdk-devel \
-  net-tools procmail xterm \
-  screen emacs vim file \
-  epel-release \
-  openssh-server xauth
+  net-tools \
+  openldap-devel \
+  openssh-server \
+  openssl-devel \
+  patch \
+  perl \
+  procmail \
+  readline-devel \
+  redhat-lsb-core \
+  screen \
+  sqlite-devel \
+  subversion \
+  tcl-devel \
+  tk-devel \
+  tree \
+  unzip \
+  vim \
+  wget \
+  xauth \
+  xterm
 
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.212.b04-0.el7_6.x86_64/
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
+
+RUN yum install -y git-lfs
+RUN git lfs install
+
+# RUN alternatives --config javac
+# RUN alternatives --config java
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64
 
 RUN groupadd -g 1000 almamgr && \
     useradd -g 1000 -u 1000 -d /home/almamgr -m -s /bin/bash almamgr
@@ -37,37 +72,36 @@ EXPOSE 22
 RUN /usr/bin/ssh-keygen -A
 CMD ["/usr/sbin/sshd", "-D"]
 
-# Adding CTA ACS repositories
-COPY cta-repos/ /etc/yum.repos.d/
 
-RUN yum update -y
+RUN mkdir /ACSSW
+WORKDIR /ACSSW
+RUN git clone https://bitbucket.sco.alma.cl/scm/asw/acs.git --branch release/ONLINE-2020JAN-B --depth 1
 
-# Installing ACS
-RUN yum install -y acs2017.6.x86_64
+# git clone should take care of fetiching the big files, but it does not, so we do it here.
+WORKDIR /ACSSW/acs
+RUN git-lfs fetch
+RUN git-lfs checkout
+
+
+# move up later, since git clones takes ages
+RUN yum install -y \
+  java-11-openjdk \
+  java-11-openjdk-devel
+
+
+WORKDIR /ACSSW/acs
+RUN source LGPL/acsBUILD/config/.acs/.bash_profile.acs
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64
+
+RUN mkdir -p /alma/$ALMASW_RELEASE
+
+WORKDIR /ACSSW/acs/ExtProd/INSTALL
+RUN make all
+
+WORKDIR /ACSSW/acs
+RUN source LGPL/acsBUILD/config/.acs/.bash_profile.acs
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64
+
+WORKDIR /ACSSW/acs
 ENV ACS_RETAIN=1
-
-# CentOS support during OS discovery with ACS
-COPY patches/bash_profile.acs.diff /alma/ACS-JUN2017/ACSSW/config/.acs/
-WORKDIR /alma/ACS-JUN2017/ACSSW/config/.acs/
-RUN patch < bash_profile.acs.diff
-RUN rm bash_profile.acs.diff
-
-USER almamgr
-SHELL ["/bin/bash", "-c"]
-
-# setup some folders with placeholders
-COPY --chown=almamgr:almamgr payload/ACSDATA/ /home/almamgr/ACSDATA/
-COPY --chown=almamgr:almamgr payload/INTROOT/ /home/almamgr/INTROOT/
-
-# Note this contains Components.xml
-# Which is not only a placeholder.
-RUN mkdir /home/almamgr/CDB
-COPY --chown=almamgr:almamgr payload/CDB/CDB /home/almamgr/CDB/CDB/
-
-COPY --chown=almamgr:almamgr payload/.bashrc /home/almamgr/.bashrc
-
-# This is only convenient for trying stuff with ssh when using gnu/screen
-COPY --chown=almamgr:almamgr payload/.screenrc /home/almamgr/.screenrc
-
-USER root
-SHELL ["/bin/bash", "-c"]
+RUN make build
