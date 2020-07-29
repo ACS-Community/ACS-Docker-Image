@@ -31,17 +31,17 @@ So we tried to document each line in the Dockfile for you.
 
 # Build
 
-    docker build . --tag=acs_test:1.0
+    docker build . --tag=acs:2020.4
 
 # Run
 
-    docker run -dP --name=test acs_test:1.0
+    docker run -dP --name=acs acs:2020.4
 
 # SSH into
 
 check exposed port with
 
-    docker port test
+    docker port acs
 
 then ssh into the running container with
 
@@ -59,13 +59,11 @@ The containers hostname will not be exactly the same
 
 The containers data is persistent over starts and stops. So when you are done playing with ACS:
 
-    docker stop test
+    docker stop acs
 
 And the next morning when you want to start playing around again:
 
-    docker start test
-    docker port test   # take not of port
+    docker start acs
+    docker port acs   # take note of port
     ssh -X -p <exposed_port> almamgr@localhost
-
-
 
