@@ -14,90 +14,92 @@ RUN yum update -y && yum install -y deltarpm
 # the ability to execute all the ACS examples, we'd be happy to hear from you
 # either by opening an issue, or by you immediately fixing this and opening a
 # pull request.
-RUN yum update -y && \
-  yum install -y \
-  autoconf \
-  bison \
-  bzip2 bzip2-devel \
-  curl \
-  dos2unix \
-  emacs \
-  epel-release \
-  expat-devel \
-  file \
-  flex \
-  freetype-devel \
-  gcc \
-  gcc-c++ \
-  gcc-gfortran \
-  git \
-  java-11-openjdk \
-  java-11-openjdk-devel \
-  ksh \
-  libffi-devel \
-  libX11-devel \
-  libxml2-devel \
-  libxslt-devel \
-  make \
-  mc \
-  nc \
-  net-tools \
-  openldap-devel \
-  openssh-server \
-  openssl-devel \
-  patch \
-  perl \
-  procmail \
-  readline-devel \
-  redhat-lsb-core \
-  screen \
-  sqlite-devel \
-  subversion \
-  tcl-devel \
-  tk-devel \
-  tree \
-  unzip \
-  vim \
-  wget \
-  xauth \
-  xterm
+RUN yum -y update \
+  && yum -y install epel-release \
+  && yum -y group install "Development Tools" \
+  && yum -y install redhat-lsb-core \
+                    autoconf \
+                    bison \
+                    bzip2 \
+                    bzip2-devel \
+                    curl \
+                    dos2unix \
+                    emacs \
+                    epel-release \
+                    expat-devel \
+                    file \
+                    flex \
+                    freetype-devel \
+                    gcc \
+                    gcc-c++ \
+                    gcc-gfortran \
+                    git \
+                    git-lfs \
+                    java-11-openjdk \
+                    java-11-openjdk-devel \
+                    ksh \
+                    lbzip2 \
+                    lbzip2-utils \
+                    libffi \
+                    libffi-devel \
+                    libX11-devel \
+                    libxml2-devel \
+                    libxslt-devel \
+                    lockfile-progs \
+                    make \
+                    mc \
+                    nc \
+                    net-tools \
+                    openldap-devel \
+                    openssh-server \
+                    openssl-devel \
+                    patch \
+                    perl \
+                    procmail \
+                    python-devel \
+                    python2-pip \
+                    python3-pip \
+                    readline-devel \
+                    redhat-lsb-core \
+                    rpm-build \
+                    screen \
+                    sqlite-devel \
+                    subversion \
+                    tcl-devel \
+                    tk-devel \
+                    tree \
+                    unzip \
+                    vim \
+                    wget \
+                    xauth \
+                    xterm \
+  && yum clean all
 
 
-# This installs git-lfs. which is needed to download the
-# external dependency tarballs.
-RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | bash
-RUN yum install -y git-lfs
-RUN git lfs install
+RUN time git clone https://bitbucket.alma.cl/scm/asw/acs.git /acs
+WORKDIR /acs
+RUN time git checkout release/OFFLINE-2020APR-B
 
-# This clones only the branch of the ACS repo, we are interested in.
-# We do not need to clone the whole repo. This should safe some time.
-WORKDIR /
-RUN git clone  --branch release/ONLINE-2020JAN-B --depth 1 https://bitbucket.alma.cl/scm/asw/acs.git ACSSW
+## Get missing (super old) libraries
 
-# The git clone above, shuld also have downloaded the "big files" using git-lfs
-# But apparently it did not. So here we manually checkout the big files.
-WORKDIR /ACSSW
-RUN git-lfs fetch origin release/ONLINE-2020JAN-B
-RUN git-lfs checkout
+WORKDIR acs/ExtProd/PRODUCTS
+RUN wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz
+RUN wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz
+RUN wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.3.3.tar.gz
 
 
-# There is a bug in that file... we fix it here.
-# TODO: This is very bad! This must be fixed upstream, not here!
-#      We need a public issue tracker for that!
-RUN sed "s@ALMASW_RELEASE=ACS-2019DEC@ALMASW_RELEASE=ACS-2020JAN@g" -i /ACSSW/LGPL/acsBUILD/config/.acs/.bash_profile.acs
+# Only needed for building BulkData and BulkDataNT modules of ACS. ALMA apparently have a proprietary version of this:
+RUN wget http://download.ociweb.com/OpenDDS/previous-releases/OpenDDS-3.5.1.tar.gz
 
-#  ... and another bug ... I think. ... so we just write the correct value inside.
-RUN echo "ACS-2020JAN" > /ACSSW/ACS_VERSION
+# some versions for python dependencies have changed.
+# Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
+# as we don't have the properietary version of DDS and don't use this modules.
 
-
-
-# ------------- Here we build the External Dependencies - ExtProd ------------
-# Note: every step in a Dockerfiel is basically independend from the previous step
-# This is why we source the bash_profile in many steps before executing
-# the actual comand.
-
-# We think JAVA_HOME must be set.
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64
+COPY pathces/ /acs_patches_delete_me
+RUN patch --verbose acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch
+RUN patch --verbose acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch
+RUN patch --verbose acs/Makefile < /acs_patches_delete_me/Makefile.patch
+RUN rm -r /acs_patches_delete_me
 
 # Here we build the external dependencies
 # Note: The output will look like this
@@ -123,13 +125,17 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64
 #     . . . 'all' done
 # So iti s okay if `buildAnd` fails. You can check the `buildAnt.log` ..
 # and you will see, that the build is actually fine, just some tests do not succeed.
-WORKDIR /ACSSW/ExtProd/INSTALL
-RUN source /ACSSW/LGPL/acsBUILD/config/.acs/.bash_profile.acs && make all
+ENV JAVA_HOME=/usr/lib/jvm/java-11
+WORKDIR /acs/ExtProd/INSTALL
+RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && time make all
 
 # --------------------- Here ACS is build. --------------------------------
-ENV ACS_RETAIN=1
-WORKDIR /ACSSW
-RUN source /ACSSW/LGPL/acsBUILD/config/.acs/.bash_profile.acs && make build
+
+# TODO I have no idea what this dies, and when it should be set and when not.
+# ENV ACS_RETAIN=1
+WORKDIR /acs
+ENV JAVA_HOME=/usr/lib/jvm/java-11
+RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && time make
 
 
 # ---------------------- ACS build done -------------------------------------
