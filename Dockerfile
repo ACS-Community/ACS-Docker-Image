@@ -92,9 +92,9 @@ RUN wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.
 # as we don't have the properietary version of DDS and don't use this modules.
 
 COPY patches/ /acs_patches_delete_me
-RUN patch --verbose acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch
-RUN patch --verbose acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch
-RUN patch --verbose acs/Makefile < /acs_patches_delete_me/Makefile.patch
+RUN patch --verbose /acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch
+RUN patch --verbose /acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch
+RUN patch --verbose /acs/Makefile < /acs_patches_delete_me/Makefile.patch
 RUN rm -r /acs_patches_delete_me
 
 # Here we build the external dependencies
