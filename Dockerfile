@@ -16,7 +16,7 @@ RUN yum update -y && yum install -y deltarpm
 # pull request.
 RUN yum -y update \
   && yum -y install epel-release \
-  && yum -y group install "Development Tools" \
+  && yum -y groupinstall "Development Tools" \
   && yum -y install redhat-lsb-core \
                     autoconf \
                     bison \
@@ -87,15 +87,11 @@ RUN wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplo
 RUN wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz
 RUN wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.3.3.tar.gz
 
-
-# Only needed for building BulkData and BulkDataNT modules of ACS. ALMA apparently have a proprietary version of this:
-RUN wget http://download.ociweb.com/OpenDDS/previous-releases/OpenDDS-3.5.1.tar.gz
-
 # some versions for python dependencies have changed.
 # Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
 # as we don't have the properietary version of DDS and don't use this modules.
 
-COPY pathces/ /acs_patches_delete_me
+COPY patches/ /acs_patches_delete_me
 RUN patch --verbose acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch
 RUN patch --verbose acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch
 RUN patch --verbose acs/Makefile < /acs_patches_delete_me/Makefile.patch
