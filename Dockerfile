@@ -6,7 +6,7 @@ FROM centos:7  AS  builder
 # it might save some time during downloading and installing the
 # dependencies below, but it is not urgently needed for ACS to work
 # c.f. https://www.cyberciti.biz/faq/delta-rpms-disabled-because-applydeltarpm-not-installed/
-RUN yum update -y && yum install -y deltarpm
+RUN yum update -y && yum install -y deltarpm && \
 
 
 # The package list below is alphabetically sorted, so not sorted by importance.
@@ -15,11 +15,9 @@ RUN yum update -y && yum install -y deltarpm
 # the ability to execute all the ACS examples, we'd be happy to hear from you
 # either by opening an issue, or by you immediately fixing this and opening a
 # pull request.
-RUN yum -y update \
-  && yum -y install epel-release \
-  && yum -y groupinstall "Development Tools" \
-  && yum -y install redhat-lsb-core \
-                    autoconf \
+	yum -y install epel-release && \
+	yum -y groupinstall "Development Tools" && \
+  	yum -y install  autoconf \
                     bison \
                     bzip2 \
                     bzip2-devel \
@@ -79,33 +77,33 @@ RUN yum -y update \
 # ============= Compiler Stage ===============================================
 FROM builder AS compiler
 
-RUN time git clone https://bitbucket.alma.cl/scm/asw/acs.git /acs
-WORKDIR /acs
-RUN time git checkout release/OFFLINE-2020APR-B
+COPY patches/ /acs_patches_delete_me
+
+RUN time git clone https://bitbucket.alma.cl/scm/asw/acs.git /acs && \
+	cd /acs && \
+	time git checkout release/OFFLINE-2020APR-B && \
+	cd ExtProd/PRODUCTS && \
 
 ## Get missing (super old) libraries
-
-WORKDIR acs/ExtProd/PRODUCTS
-RUN wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz
-RUN wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz
-RUN wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.3.3.tar.gz
+wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz && \
+wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz && \
+wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.3.3.tar.gz && \
 
 # some versions for python dependencies have changed.
 # Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
 # as we don't have the properietary version of DDS and don't use this modules.
 
-COPY patches/ /acs_patches_delete_me
-RUN patch --verbose /acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch
-RUN patch --verbose /acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch
-RUN patch --verbose /acs/Makefile < /acs_patches_delete_me/Makefile.patch
-RUN rm -r /acs_patches_delete_me
 
-
+	patch --verbose /acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch && \
+	patch --verbose /acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch && \
+	patch --verbose /acs/Makefile < /acs_patches_delete_me/Makefile.patch && \
+	rm -r /acs_patches_delete_me && \
+	cd /acs/ExtProd/INSTALL && \
 # --------------------- Here external dependencies are built --------------
-WORKDIR /acs/ExtProd/INSTALL
-RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-     export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
-     time make all
+	source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
+    time make all && \
+    find /alma -name "*.o" -exec rm -v {} \; && \
 
 # Expected output:
 #    WARNING: Do not close this terminal: some build might fail!
@@ -134,10 +132,10 @@ RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
 
 # --------------------- Here ACS is build. --------------------------------
 
-WORKDIR /acs
-RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-     export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
-     time make
+	cd /acs && \
+	source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
+    time make
 # Expected output:
 # Evaluating current ACS TAG from https://bitbucket.alma.cl/scm/asw/acs.git
 # REPO tag is: release/OFFLINE-2020APR-B
@@ -250,27 +248,27 @@ RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
 FROM builder
 
 WORKDIR /
+
 COPY --from=compiler /alma /alma
 
 # Here we create the user almamgr
 RUN  groupadd -g 1000 almamgr && \
      useradd -g 1000 -u 1000 -d /home/almamgr -m -s /bin/bash almamgr && \
-     passwd -d almamgr
-
+     passwd -d almamgr && \
 # For conveniece we source the alma .bash_profile.acs in the user .bash_rc
 # and export JAVA_HOME
-RUN  echo "source /alma/ACS-2020APR/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
-     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc
+     echo "source /alma/ACS-2020APR/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
+	 echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc && \
 
 
 # Here we make sure, that sshd is setup correctly. Using sshd is a docker anti-pattern
 # but for simplicity we do it nevertheless.
 # NOTE! We allow empty passwords.
-RUN  sed "s@#X11UseLocalhost yes@X11UseLocalhost no@g" -i /etc/ssh/sshd_config && \
+     sed "s@#X11UseLocalhost yes@X11UseLocalhost no@g" -i /etc/ssh/sshd_config && \
      sed "s@#UseDNS yes@UseDNS no@g" -i /etc/ssh/sshd_config && \
-     sed "s@#PermitEmptyPasswords no@PermitEmptyPasswords yes@g" -i /etc/ssh/sshd_config
+     sed "s@#PermitEmptyPasswords no@PermitEmptyPasswords yes@g" -i /etc/ssh/sshd_config && \
 # sshd needs these keys to be created.
-RUN /usr/bin/ssh-keygen -A
+     /usr/bin/ssh-keygen -A
 
 # We tell docker, that we plan to expost port 22 - the default SSH port.
 # With: docker run -dP   docker decides which port to use on the host
