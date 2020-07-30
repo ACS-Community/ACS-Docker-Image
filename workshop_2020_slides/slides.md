@@ -1,16 +1,25 @@
-% Docker image for beginners
+% Official Docker Image
 % Dominik Neise
-% 22.07.2020
+% 29.07.2020
+
+---
+
+# Official Docker Image  - or - Docker Image for Newcomers
+
+Making the journey to knowledge a walk in the park
+
+![](imgs/question-2736480_1280.jpg)
+
 
 ---
 
 # Disclaimer
 
- - I am not a docker evangelist, in fact I only used docker in a few projects so far.
+I am not a docker evangelist, in fact I only used docker in a few projects so far.
 
- - I have not much experience with virtualization in general.
+I have not much experience with virtualization in general.
 
- - So this is just me showing you a preliminary proposal, and then brainstorming?
+So this is just me showing you a preliminary proposal, and then brainstorming?
 
 ---
 
@@ -20,21 +29,26 @@ ACS is hard to install. (I never managed to install it from the sources yet)
 
 We want a strong and growing community. So we need to reduce friction loss for newcomers.
 
+## How do people learn?
+
 ---
 
-# Requirements
+![](imgs/knit-869221_1280.jpg)
 
-In order of importance
+---
 
- 1. Easy to use: download & start right away!
+# Allow the to pull the thread!
 
- 2. Allows to explore *all* ACS examples
+
+ 1. Simple Start: download & use!
+
+ 2. Allows to explore ACS examples
 
  3. Allows to develop and test a first component
 
  4. No need to unlearn: Is extentable, once developer becomes more experienced
 
- 5. ... ?
+ 5. Enables to dig deeper.
 
 ---
 
@@ -45,46 +59,61 @@ use as a start.
 
 Provide information about its use in a *prominent place* on the ACS website.
 
+![](imgs/frontpage.png)
+
 At the *same place* provide information on how to report any issues.
 
 ---
 
-## Current state
+![](imgs/docker_hub_git_hub.png)
 
-What I show here is heavily based on an ACS Dockerfile taken from LST,
-where it is used for the Telescope Control Unit
-
-<https://github.com/dneise/acs_test>
-
-This github repo, is linked to a dockerhub repo, which automatically builds a fresh
-image when the github repo makes a new release.
-
-<https://hub.docker.com/r/dneise/acs_test>
-
-Issues:
-
- - build is based on RPMs proided by CTA.
- - it does not use the most recent version of ACS, but ACS 2017.
- - I do not know if it really is minimal
- - I use SSH, which is a docker-anti-pattern.
 
 ---
 
-## Usage for beginners
+# Dockerfile
+
+<https://github.com/dneise/acs_test/blob/master/Dockerfile>
+
+---
+
+
+## Current state
+
+This is based on:
+
+ - an ACS Dockerfile taken from LST, where it is used for the Telescope Control Unit.
+ - Patrick Sizun personal build notes
+ - [DESY `acs-rpm-docker`](https://stash.desy.de/projects/ZNCTAT/repos/acs-rpm-docker)
+
+### Docker hub page
+
+<https://hub.docker.com/r/dneise/acs_test>
+
+### git repo
+
+<https://github.com/dneise/acs_test>
+
+### Known Issues
+
+<https://github.com/dneise/acs_test/issues>
+
+---
+
+# Journey
 
 Download the image, it is pretty big and takes some time
 
-    docker pull dneise/acs_test:latest
+    docker pull alma/acs:2020.4
 
-run a fresh instance of the image named `test`.
+run a fresh instance of the image named `acs`.
 
-    docker run -dP --name=test dneise/acs_test
+    docker run -dP --name=acs alma/acs:2020.4
 
 This starts a pseudo VM on your machine, in order to play with this machine you'll
 need to log into that machine, via SSH. The port you'll need to connect to is random,
 so we need to ask the machine which port it uses:
 
-    docker port test
+    docker port acs
     # e.g. 22/tcp -> 0.0.0.0:33775
 
 Now we can connect to the machine, we provide passwordless SSH access.
@@ -112,34 +141,34 @@ If not, please send open an issue: **explain how to open issues here**
 After a day full of new experiences with the ACS docker VM, you can just disconnect from
 the SSH session and stop the machine (put it to sleep), like this:
 
-    docker stop test
+    docker stop acs
 
 ## Restarting
 
 And tomorrow after a good nights sleep and full of new ideas, just do:
 
-    docker start test
-    docker port test # note down the port
+    docker start acs
+    docker port acs # note down the port
     ssh -p <possibly different port than yesterday> -X almamgr@localhost
+
+---
+
+
+![](imgs/cat-2201460_1280.jpg)
 
 ---
 
 # Almost done! - Proposed Workflow
 
-I propose the following workflow regarding maintenance of this image:
+ - public repo,  ()
+ - maintained by community
+ - less load for ACS core devs
+ - allows newcomers to examine Dockerfile & comment on it (issues)
 
-Have a *public* git repo on github, where ACS community members maintain the Dockerfile to keep it up to date.
-
-This takes workload off the sholders of ACS authors.
-
-It allows newcomers to *examine* the Dockerfile in order to learn how to extend it once they get more experience.
-
-The git-repo on github forms a natural place for newcomers to ask questions, since it has a public issue tracker right from the start. So there is no question about whom to ask.
 
 # Brainstorming Time!
 
- 3 ... 2 ... 1 ... go!
-
+![](imgs/teamwork-3276682_1280.jpg)
 
 ---
 

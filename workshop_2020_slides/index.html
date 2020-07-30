@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
- "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+ "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
   <meta name="author" content="Dominik Neise" />
-  <title>Docker image for beginners</title>
+  <title>Official Docker Image</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
 div.sourceCode { overflow-x: auto; }
@@ -53,66 +53,94 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 <body>
 <div class="slide titlepage">
-  <h1 class="title">Docker image for beginners</h1>
+  <h1 class="title">Official Docker Image</h1>
   <p class="author">
 Dominik Neise
   </p>
-  <p class="date">22.07.2020</p>
+  <p class="date">29.07.2020</p>
+</div>
+<div id="official-docker-image---or---docker-image-for-newcomers" class="slide section level1">
+<h1>Official Docker Image - or - Docker Image for Newcomers</h1>
+<p>Making the journey to knowledge a walk in the park</p>
+<div class="figure">
+<img src="imgs/question-2736480_1280.jpg" />
+
+</div>
 </div>
 <div id="disclaimer" class="slide section level1">
 <h1>Disclaimer</h1>
-<ul>
-<li><p>I am not a docker evangelist, in fact I only used docker in a few projects so far.</p></li>
-<li><p>I have not much experience with virtualization in general.</p></li>
-<li><p>So this is just me showing you a preliminary proposal, and then brainstorming?</p></li>
-</ul>
+<p>I am not a docker evangelist, in fact I only used docker in a few projects so far.</p>
+<p>I have not much experience with virtualization in general.</p>
+<p>So this is just me showing you a preliminary proposal, and then brainstorming?</p>
 </div>
 <div id="whats-the-problem" class="slide section level1">
 <h1>What's the problem?</h1>
 <p>ACS is hard to install. (I never managed to install it from the sources yet)</p>
 <p>We want a strong and growing community. So we need to reduce friction loss for newcomers.</p>
+<h2 id="how-do-people-learn">How do people learn?</h2>
 </div>
-<div id="requirements" class="slide section level1">
-<h1>Requirements</h1>
-<p>In order of importance</p>
+<div class="slide section level1">
+
+<div class="figure">
+<img src="imgs/knit-869221_1280.jpg" />
+
+</div>
+</div>
+<div id="allow-the-to-pull-the-thread" class="slide section level1">
+<h1>Allow the to pull the thread!</h1>
 <ol style="list-style-type: decimal">
-<li><p>Easy to use: download &amp; start right away!</p></li>
-<li><p>Allows to explore <em>all</em> ACS examples</p></li>
+<li><p>Simple Start: download &amp; use!</p></li>
+<li><p>Allows to explore ACS examples</p></li>
 <li><p>Allows to develop and test a first component</p></li>
 <li><p>No need to unlearn: Is extentable, once developer becomes more experienced</p></li>
-<li><p>... ?</p></li>
+<li><p>Enables to dig deeper.</p></li>
 </ol>
 </div>
 <div id="the-proposal" class="slide section level1">
 <h1>The Proposal</h1>
 <p>Let's provide newcomers with a ready-made <em>minimal</em> docker image, they can just use as a start.</p>
 <p>Provide information about its use in a <em>prominent place</em> on the ACS website.</p>
+<div class="figure">
+<img src="imgs/frontpage.png" />
+
+</div>
 <p>At the <em>same place</em> provide information on how to report any issues.</p>
 </div>
 <div class="slide section level1">
 
-<h2 id="current-state">Current state</h2>
-<p>I have pieced together something, from <code>Dockerfile</code>s I was given when I started.</p>
-<p><a href="https://github.com/dneise/acs_test" class="uri">https://github.com/dneise/acs_test</a></p>
-<p>This github repo, is linked to a dockerhub repo, which automatically builds a fresh image when the github repo makes a new release.</p>
-<p><a href="https://hub.docker.com/r/dneise/acs_test" class="uri">https://hub.docker.com/r/dneise/acs_test</a></p>
-<p>Issues:</p>
-<ul>
-<li>build is based on RPMs proided by CTA.</li>
-<li>it does not use the most recent version of ACS, but ACS 2017.</li>
-<li>I do not know if it really is minimal</li>
-<li>I use SSH, which is a docker-anti-pattern.</li>
-</ul>
+<div class="figure">
+<img src="imgs/docker_hub_git_hub.png" />
+
+</div>
+</div>
+<div id="dockerfile" class="slide section level1">
+<h1>Dockerfile</h1>
+<p><a href="https://github.com/dneise/acs_test/blob/master/Dockerfile" class="uri">https://github.com/dneise/acs_test/blob/master/Dockerfile</a></p>
 </div>
 <div class="slide section level1">
 
-<h2 id="usage-for-beginners">Usage for beginners</h2>
+<h2 id="current-state">Current state</h2>
+<p>This is based on:</p>
+<ul>
+<li>an ACS Dockerfile taken from LST, where it is used for the Telescope Control Unit.</li>
+<li>Patrick Sizun personal build notes</li>
+<li><a href="https://stash.desy.de/projects/ZNCTAT/repos/acs-rpm-docker">DESY <code>acs-rpm-docker</code></a></li>
+</ul>
+<h3 id="docker-hub-page">Docker hub page</h3>
+<p><a href="https://hub.docker.com/r/dneise/acs_test" class="uri">https://hub.docker.com/r/dneise/acs_test</a></p>
+<h3 id="git-repo">git repo</h3>
+<p><a href="https://github.com/dneise/acs_test" class="uri">https://github.com/dneise/acs_test</a></p>
+<h3 id="known-issues">Known Issues</h3>
+<p><a href="https://github.com/dneise/acs_test/issues" class="uri">https://github.com/dneise/acs_test/issues</a></p>
+</div>
+<div id="journey" class="slide section level1">
+<h1>Journey</h1>
 <p>Download the image, it is pretty big and takes some time</p>
-<pre><code>docker pull dneise/acs_test:latest</code></pre>
-<p>run a fresh instance of the image named <code>test</code>.</p>
-<pre><code>docker run -dP --name=test dneise/acs_test</code></pre>
+<pre><code>docker pull alma/acs:2020.4</code></pre>
+<p>run a fresh instance of the image named <code>acs</code>.</p>
+<pre><code>docker run -dP --name=acs alma/acs:2020.4</code></pre>
 <p>This starts a pseudo VM on your machine, in order to play with this machine you'll need to log into that machine, via SSH. The port you'll need to connect to is random, so we need to ask the machine which port it uses:</p>
-<pre><code>docker port test
+<pre><code>docker port acs
 # e.g. 22/tcp -&gt; 0.0.0.0:33775</code></pre>
 <p>Now we can connect to the machine, we provide passwordless SSH access. This is <strong>insecure</strong> but very convenient.</p>
 <pre><code>ssh -p 33775 -X almamgr@localhost</code></pre>
@@ -128,24 +156,35 @@ Dominik Neise
 
 <h2 id="ending-your-day">Ending your day</h2>
 <p>After a day full of new experiences with the ACS docker VM, you can just disconnect from the SSH session and stop the machine (put it to sleep), like this:</p>
-<pre><code>docker stop test</code></pre>
+<pre><code>docker stop acs</code></pre>
 <h2 id="restarting">Restarting</h2>
 <p>And tomorrow after a good nights sleep and full of new ideas, just do:</p>
-<pre><code>docker start test
-docker port test # note down the port
+<pre><code>docker start acs
+docker port acs # note down the port
 ssh -p &lt;possibly different port than yesterday&gt; -X almamgr@localhost</code></pre>
+</div>
+<div class="slide section level1">
+
+<div class="figure">
+<img src="imgs/cat-2201460_1280.jpg" />
+
+</div>
 </div>
 <div id="almost-done---proposed-workflow" class="slide section level1">
 <h1>Almost done! - Proposed Workflow</h1>
-<p>I propose the following workflow regarding maintenance of this image:</p>
-<p>Have a <em>public</em> git repo on github, where ACS community members maintain the Dockerfile to keep it up to date.</p>
-<p>This takes workload off the sholders of ACS authors.</p>
-<p>It allows newcomers to <em>examine</em> the Dockerfile in order to learn how to extend it once they get more experience.</p>
-<p>The git-repo on github forms a natural place for newcomers to ask questions, since it has a public issue tracker right from the start. So there is no question about whom to ask.</p>
+<ul>
+<li>public repo, ()</li>
+<li>maintained by community</li>
+<li>less load for ACS core devs</li>
+<li>allows newcomers to examine Dockerfile &amp; comment on it (issues)</li>
+</ul>
 </div>
 <div id="brainstorming-time" class="slide section level1">
 <h1>Brainstorming Time!</h1>
-<p>3 ... 2 ... 1 ... go!</p>
+<div class="figure">
+<img src="imgs/teamwork-3276682_1280.jpg" />
+
+</div>
 </div>
 <div id="backup-slides" class="slide section level1">
 <h1>Backup slides</h1>
