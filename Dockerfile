@@ -1,4 +1,5 @@
 FROM centos:7  AS  builder
+# ================ Builder stage =============================================
 # we base our image on a vanilla Centos 7 image.
 
 # install deltarpm prior to installing everything else
@@ -75,7 +76,7 @@ RUN yum -y update \
                     xterm \
   && yum clean all
 
-# ============================================================================
+# ============= Compiler Stage ===============================================
 FROM builder AS compiler
 
 RUN time git clone https://bitbucket.alma.cl/scm/asw/acs.git /acs
@@ -100,14 +101,13 @@ RUN patch --verbose /acs/Makefile < /acs_patches_delete_me/Makefile.patch
 RUN rm -r /acs_patches_delete_me
 
 
+# --------------------- Here external dependencies are built --------------
 WORKDIR /acs/ExtProd/INSTALL
 RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
      time make all
 
 # Expected output:
-# Here we build the external dependencies
-# Note: The output will look like this
 #    WARNING: Do not close this terminal: some build might fail!
 #    WARNING: DISPLAY not set. Some build/tests might fail!
 #    Create ACS-2019DEC
@@ -128,25 +128,96 @@ RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
 #
 #    __oOo__
 #     . . . 'all' done
-# So iti s okay if `buildAnd` fails. You can check the `buildAnt.log` ..
+
+# So it is okay if `buildAnd` fails. You can check the `buildAnt.log` ..
 # and you will see, that the build is actually fine, just some tests do not succeed.
-
-
 
 # --------------------- Here ACS is build. --------------------------------
 
-# TODO I have no idea what this does, and when it should be set and when not.
-# ENV ACS_RETAIN=1
-
-# At the moment this fails, but I want to ignore that and let the build
-# succeed.
 WORKDIR /acs
 RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
      time make
+# Expected output:
+# Evaluating current ACS TAG from https://bitbucket.alma.cl/scm/asw/acs.git
+# REPO tag is: release/OFFLINE-2020APR-B
+############ Clean Build Log File: build.log #################
+############ Check directory tree for modules  #################
+############ Prepare installation areas      #################
+############ (Re-)build ACS Software         #################
+############ LGPL/Kit/doc SRC
+############ LGPL/Kit/acs SRC
+############ LGPL/Kit/acstempl SRC
+############ LGPL/Kit/acsutilpy SRC
+############ LGPL/Tools MAIN
+  ############ (Re-)build Tools Software         #################
+  ############ tat MAIN
+  ############ expat WS
+  ############ loki WS
+  ############ extjars MAIN
+  ############ antlr MAIN
+  ############ hibernate MAIN
+  ############ extpy MAIN
+  ############ cppunit MAIN
+  ############ getopt MAIN
+  ############ astyle MAIN
+  ############ xercesc MAIN
+  ############ xercesj MAIN
+  ############ castor MAIN
+  ############ xsddoc MAIN
+  ############ extidl WS
+  ############ vtd-xml MAIN
+  ############ oAW MAIN
+  ############ shunit2 MAIN
+  ############ log4cpp WS
+  ############ scxml_apache MAIN
+  ############ DONE (Re-)build Tools Software    #################
+############ LGPL/CommonSoftware/jacsutil SRC
+############ LGPL/CommonSoftware/xmljbind SRC
+############ LGPL/CommonSoftware/xmlpybind SRC
+############ LGPL/CommonSoftware/acserridl WS
+############ LGPL/CommonSoftware/acsidlcommon WS
+############ LGPL/CommonSoftware/acsutil WS
+############ LGPL/CommonSoftware/acsstartup SRC
+############ LGPL/CommonSoftware/loggingidl WS
+############ LGPL/CommonSoftware/logging WS
+############ LGPL/CommonSoftware/acserr WS
+############ LGPL/CommonSoftware/acserrTypes WS
+############ LGPL/CommonSoftware/acsQoS WS
+############ LGPL/CommonSoftware/acsthread WS
+############ LGPL/CommonSoftware/acscomponentidl WS
+############ LGPL/CommonSoftware/cdbidl WS
+############ LGPL/CommonSoftware/maciidl WS
+############ LGPL/CommonSoftware/baciidl WS
+############ LGPL/CommonSoftware/acsncidl WS
+############ LGPL/CommonSoftware/acsjlog SRC
+############ LGPL/CommonSoftware/repeatGuard WS
+############ LGPL/CommonSoftware/loggingts WS
+############ LGPL/CommonSoftware/loggingtsTypes WS
+############ LGPL/CommonSoftware/jacsutil2 SRC
+############ LGPL/CommonSoftware/cdb WS
+############ LGPL/CommonSoftware/cdbChecker SRC
+############ LGPL/CommonSoftware/codegen SRC
+############ LGPL/CommonSoftware/cdb_rdb SRC
+############ LGPL/CommonSoftware/acsalarmidl WS
+############ LGPL/CommonSoftware/acsalarm SRC
+############ LGPL/CommonSoftware/acsContainerServices WS
+############ LGPL/CommonSoftware/acscomponent WS
+############ LGPL/CommonSoftware/recovery WS
+############ LGPL/CommonSoftware/basenc WS
+############ LGPL/CommonSoftware/archiveevents WS
+############ LGPL/CommonSoftware/parameter SRC
+############ LGPL/CommonSoftware/baci WS
+############ LGPL/CommonSoftware/enumprop WS
+############ LGPL/CommonSoftware/acscallbacks SRC
+############ LGPL/CommonSoftware/acsdaemonidl WS
+############ LGPL/CommonSoftware/jacsalarm SRC
+############ LGPL/CommonSoftware/jmanager SRC
+############ LGPL/CommonSoftware/maci WS
+# ... tbc
 
 
-# ============================================================================
+# ============= Target image stage ===========================================
 FROM builder
 
 WORKDIR /
