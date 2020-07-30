@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:7  AS  builder
 # we base our image on a vanilla Centos 7 image.
 
 # install deltarpm prior to installing everything else
@@ -75,6 +75,8 @@ RUN yum -y update \
                     xterm \
   && yum clean all
 
+# ============================================================================
+FROM builder AS compiler
 
 RUN time git clone https://bitbucket.alma.cl/scm/asw/acs.git /acs
 WORKDIR /acs
@@ -141,6 +143,40 @@ RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
 WORKDIR /acs
 RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
-     time make; \
-     exit 0
+     time make
 
+
+# ============================================================================
+FROM builder
+
+WORKDIR /
+COPY --from=compiler /alma /alma
+
+# Here we create the user almamgr
+RUN  groupadd -g 1000 almamgr && \
+     useradd -g 1000 -u 1000 -d /home/almamgr -m -s /bin/bash almamgr && \
+     passwd -d almamgr
+
+# For conveniece we source the alma .bash_profile.acs in the user .bash_rc
+# and export JAVA_HOME
+RUN  echo "source /alma/ACS-2020APR/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
+     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc
+
+
+# Here we make sure, that sshd is setup correctly. Using sshd is a docker anti-pattern
+# but for simplicity we do it nevertheless.
+# NOTE! We allow empty passwords.
+RUN  sed "s@#X11UseLocalhost yes@X11UseLocalhost no@g" -i /etc/ssh/sshd_config && \
+     sed "s@#UseDNS yes@UseDNS no@g" -i /etc/ssh/sshd_config && \
+     sed "s@#PermitEmptyPasswords no@PermitEmptyPasswords yes@g" -i /etc/ssh/sshd_config
+# sshd needs these keys to be created.
+RUN /usr/bin/ssh-keygen -A
+
+# We tell docker, that we plan to expost port 22 - the default SSH port.
+# With: docker run -dP   docker decides which port to use on the host
+# With: docker run -d -p 10022:22  we decided that port 22 should be exposed as 10022.
+# Both variants have their use cases.
+EXPOSE 22
+
+# As a last step we, we start the SSH daemon.
+CMD ["/usr/sbin/sshd", "-D"]
