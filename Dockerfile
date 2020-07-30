@@ -214,6 +214,35 @@ RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
 ############ LGPL/CommonSoftware/jacsalarm SRC
 ############ LGPL/CommonSoftware/jmanager SRC
 ############ LGPL/CommonSoftware/maci WS
+############ LGPL/CommonSoftware/task SRC
+############ LGPL/CommonSoftware/acstime WS
+############ LGPL/CommonSoftware/acsnc WS
+############ LGPL/CommonSoftware/acsdaemon WS
+############ LGPL/CommonSoftware/acslog WS
+############ LGPL/CommonSoftware/acstestcompcpp SRC
+############ LGPL/CommonSoftware/acsexmpl WS
+############ LGPL/CommonSoftware/jlogEngine SRC
+############ LGPL/CommonSoftware/acspycommon SRC
+############ LGPL/CommonSoftware/acsalarmpy SRC
+############ LGPL/CommonSoftware/acspy SRC
+############ LGPL/CommonSoftware/comphelpgen SRC
+############ LGPL/CommonSoftware/XmlIdl SRC
+############ LGPL/CommonSoftware/define WS
+############ LGPL/CommonSoftware/acstestentities SRC
+############ LGPL/CommonSoftware/jcont SRC
+############ LGPL/CommonSoftware/jcontnc SRC
+############ LGPL/CommonSoftware/nsStatisticsService SRC
+############ LGPL/CommonSoftware/jacsalarmtest SRC
+############ LGPL/CommonSoftware/jcontexmpl SRC
+############ LGPL/CommonSoftware/jbaci SRC
+############ LGPL/CommonSoftware/monitoring MAIN
+  ############ (Re-)build monitoring Software         #################
+  ############ monicd WS
+  ############ moncollect WS
+  ############ monblobber MAIN
+  ############ moncontroller MAIN
+  ############ DONE (Re-)build monitoring Software    #################
+############ LGPL/CommonSoftware/acssamp WS
 # ... tbc
 
 
