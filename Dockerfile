@@ -81,7 +81,7 @@ FROM builder AS compiler
 
 RUN time git clone https://bitbucket.alma.cl/scm/asw/acs.git /acs
 WORKDIR /acs
-RUN time git checkout release/OFFLINE-2020APR-B
+RUN time git checkout acs/2020JUN
 
 ## Get missing (super old) libraries
 
@@ -97,7 +97,7 @@ RUN wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.
 COPY patches/ /acs_patches_delete_me
 RUN patch --verbose /acs/ExtProd/PRODUCTS/acs-py27.req < /acs_patches_delete_me/acs-py27.req.patch
 RUN patch --verbose /acs/ExtProd/PRODUCTS/acs-py37.req < /acs_patches_delete_me/acs-py37.req.patch
-RUN patch --verbose /acs/Makefile < /acs_patches_delete_me/Makefile.patch
+RUN sed -i 's/bulkDataNT bulkData //g' /acs/Makefile
 RUN rm -r /acs_patches_delete_me
 
 
@@ -107,143 +107,11 @@ RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
      time make all
 
-# Expected output:
-#    WARNING: Do not close this terminal: some build might fail!
-#    WARNING: DISPLAY not set. Some build/tests might fail!
-#    Create ACS-2019DEC
-#    buildTcltk                                                 [  OK  ]
-#    buildTAO                                                   [  OK  ]
-#    buildMaven                                                 [  OK  ]
-#    buildAnt                                                   [==> FAILED]
-#    buildJacORB                                                [  OK  ]
-#    buildPython^[                                              [  OK  ]
-#    buildPyModules                                             [  OK  ]
-#    buildOmniORB                                               [  OK  ]
-#    buildMico                                                  [  OK  ]
-#    buildEclipse                                               [  OK  ]
-#    buildswig                                                  [  OK  ]
-#    buildBoost                                                 [  OK  ]
-#    WARNING: Now log out and login again to make sure that
-#             the environment is re-evaluated!
-#
-#    __oOo__
-#     . . . 'all' done
-
-# So it is okay if `buildAnd` fails. You can check the `buildAnt.log` ..
-# and you will see, that the build is actually fine, just some tests do not succeed.
-
 # --------------------- Here ACS is build. --------------------------------
-
 WORKDIR /acs
 RUN source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64 && \
      time make
-# Expected output:
-# Evaluating current ACS TAG from https://bitbucket.alma.cl/scm/asw/acs.git
-# REPO tag is: release/OFFLINE-2020APR-B
-############ Clean Build Log File: build.log #################
-############ Check directory tree for modules  #################
-############ Prepare installation areas      #################
-############ (Re-)build ACS Software         #################
-############ LGPL/Kit/doc SRC
-############ LGPL/Kit/acs SRC
-############ LGPL/Kit/acstempl SRC
-############ LGPL/Kit/acsutilpy SRC
-############ LGPL/Tools MAIN
-  ############ (Re-)build Tools Software         #################
-  ############ tat MAIN
-  ############ expat WS
-  ############ loki WS
-  ############ extjars MAIN
-  ############ antlr MAIN
-  ############ hibernate MAIN
-  ############ extpy MAIN
-  ############ cppunit MAIN
-  ############ getopt MAIN
-  ############ astyle MAIN
-  ############ xercesc MAIN
-  ############ xercesj MAIN
-  ############ castor MAIN
-  ############ xsddoc MAIN
-  ############ extidl WS
-  ############ vtd-xml MAIN
-  ############ oAW MAIN
-  ############ shunit2 MAIN
-  ############ log4cpp WS
-  ############ scxml_apache MAIN
-  ############ DONE (Re-)build Tools Software    #################
-############ LGPL/CommonSoftware/jacsutil SRC
-############ LGPL/CommonSoftware/xmljbind SRC
-############ LGPL/CommonSoftware/xmlpybind SRC
-############ LGPL/CommonSoftware/acserridl WS
-############ LGPL/CommonSoftware/acsidlcommon WS
-############ LGPL/CommonSoftware/acsutil WS
-############ LGPL/CommonSoftware/acsstartup SRC
-############ LGPL/CommonSoftware/loggingidl WS
-############ LGPL/CommonSoftware/logging WS
-############ LGPL/CommonSoftware/acserr WS
-############ LGPL/CommonSoftware/acserrTypes WS
-############ LGPL/CommonSoftware/acsQoS WS
-############ LGPL/CommonSoftware/acsthread WS
-############ LGPL/CommonSoftware/acscomponentidl WS
-############ LGPL/CommonSoftware/cdbidl WS
-############ LGPL/CommonSoftware/maciidl WS
-############ LGPL/CommonSoftware/baciidl WS
-############ LGPL/CommonSoftware/acsncidl WS
-############ LGPL/CommonSoftware/acsjlog SRC
-############ LGPL/CommonSoftware/repeatGuard WS
-############ LGPL/CommonSoftware/loggingts WS
-############ LGPL/CommonSoftware/loggingtsTypes WS
-############ LGPL/CommonSoftware/jacsutil2 SRC
-############ LGPL/CommonSoftware/cdb WS
-############ LGPL/CommonSoftware/cdbChecker SRC
-############ LGPL/CommonSoftware/codegen SRC
-############ LGPL/CommonSoftware/cdb_rdb SRC
-############ LGPL/CommonSoftware/acsalarmidl WS
-############ LGPL/CommonSoftware/acsalarm SRC
-############ LGPL/CommonSoftware/acsContainerServices WS
-############ LGPL/CommonSoftware/acscomponent WS
-############ LGPL/CommonSoftware/recovery WS
-############ LGPL/CommonSoftware/basenc WS
-############ LGPL/CommonSoftware/archiveevents WS
-############ LGPL/CommonSoftware/parameter SRC
-############ LGPL/CommonSoftware/baci WS
-############ LGPL/CommonSoftware/enumprop WS
-############ LGPL/CommonSoftware/acscallbacks SRC
-############ LGPL/CommonSoftware/acsdaemonidl WS
-############ LGPL/CommonSoftware/jacsalarm SRC
-############ LGPL/CommonSoftware/jmanager SRC
-############ LGPL/CommonSoftware/maci WS
-############ LGPL/CommonSoftware/task SRC
-############ LGPL/CommonSoftware/acstime WS
-############ LGPL/CommonSoftware/acsnc WS
-############ LGPL/CommonSoftware/acsdaemon WS
-############ LGPL/CommonSoftware/acslog WS
-############ LGPL/CommonSoftware/acstestcompcpp SRC
-############ LGPL/CommonSoftware/acsexmpl WS
-############ LGPL/CommonSoftware/jlogEngine SRC
-############ LGPL/CommonSoftware/acspycommon SRC
-############ LGPL/CommonSoftware/acsalarmpy SRC
-############ LGPL/CommonSoftware/acspy SRC
-############ LGPL/CommonSoftware/comphelpgen SRC
-############ LGPL/CommonSoftware/XmlIdl SRC
-############ LGPL/CommonSoftware/define WS
-############ LGPL/CommonSoftware/acstestentities SRC
-############ LGPL/CommonSoftware/jcont SRC
-############ LGPL/CommonSoftware/jcontnc SRC
-############ LGPL/CommonSoftware/nsStatisticsService SRC
-############ LGPL/CommonSoftware/jacsalarmtest SRC
-############ LGPL/CommonSoftware/jcontexmpl SRC
-############ LGPL/CommonSoftware/jbaci SRC
-############ LGPL/CommonSoftware/monitoring MAIN
-  ############ (Re-)build monitoring Software         #################
-  ############ monicd WS
-  ############ moncollect WS
-  ############ monblobber MAIN
-  ############ moncontroller MAIN
-  ############ DONE (Re-)build monitoring Software    #################
-############ LGPL/CommonSoftware/acssamp WS
-# ... tbc
 
 
 # ============= Target image stage ===========================================
@@ -259,7 +127,7 @@ RUN  groupadd -g 1000 almamgr && \
 
 # For conveniece we source the alma .bash_profile.acs in the user .bash_rc
 # and export JAVA_HOME
-RUN  echo "source /alma/ACS-2020APR/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
+RUN  echo "source /alma/ACS-2020JUN/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
      echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc
 
 

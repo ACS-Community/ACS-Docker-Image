@@ -31,11 +31,11 @@ So we tried to document each line in the Dockfile for you.
 
 # Build
 
-    docker build . --tag=acs:2020.4
+    docker build . --tag=acs:2020.6
 
 # Run
 
-    docker run -dP --name=acs acs:2020.4
+    docker run -dP --name=acs acs:2020.6
 
 # SSH into
 
