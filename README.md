@@ -33,6 +33,9 @@ So we tried to document each line in the Dockfile for you.
 
     docker build . --tag=acs:2020.6
 
+    If you are interested on the expected output, please go to [our docker hub page](https://hub.docker.com/repository/docker/dneise/acs_test/builds). Click on any recent successful build. And then look at the Build Logs.
+    For example [this one](https://hub.docker.com/repository/registry-1.docker.io/dneise/acs_test/builds/7d7669bf-59dc-43db-bd1d-592ca072de45)
+
 # Run
 
     docker run -dP --name=acs acs:2020.6
