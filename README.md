@@ -28,7 +28,6 @@ So we tried to document each line in the Dockfile for you.
 
 
 
-
 # Build
 
     docker build . --tag=acs:2020.6
@@ -38,9 +37,42 @@ So we tried to document each line in the Dockfile for you.
 
 # Run
 
-    docker run -dP --name=acs acs:2020.6
+    docker run -it -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:rw" --name=acs acs:2020.6
 
 # SSH into
+
+if you want to use SSH do access your container, you'll need to build another image
+which derives from the official image, e.g. like this
+```Dockerfile
+FROM dneise/acs_test:2020.6
+
+# Here we make sure, that sshd is setup correctly. Using sshd is a docker anti-pattern
+# but for simplicity we do it nevertheless.
+# NOTE! We allow empty passwords.
+RUN  sed "s@#X11UseLocalhost yes@X11UseLocalhost no@g" -i /etc/ssh/sshd_config && \
+     sed "s@#UseDNS yes@UseDNS no@g" -i /etc/ssh/sshd_config && \
+     sed "s@#PermitEmptyPasswords no@PermitEmptyPasswords yes@g" -i /etc/ssh/sshd_config
+# sshd needs these keys to be created.
+RUN /usr/bin/ssh-keygen -A
+
+# We tell docker, that we plan to expost port 22 - the default SSH port.
+# With: docker run -dP   docker decides which port to use on the host
+# With: docker run -d -p 10022:22  we decided that port 22 should be exposed as 10022.
+# Both variants have their use cases.
+EXPOSE 22
+
+# As a last step we, we start the SSH daemon.
+CMD ["/usr/sbin/sshd", "-D"]
+
+```
+
+Then build this e.g. like this:
+
+    docker build . --tag=acs:2020.6-ssh
+
+And then run it like this:
+
+    docker run -dP --name=acs acs:2020.6
 
 check exposed port with
 
