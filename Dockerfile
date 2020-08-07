@@ -120,6 +120,8 @@ FROM builder
 WORKDIR /
 COPY --from=compiler /alma /alma
 
+RUN ln -s /alma/ACS-2020JUN/ACSSW/config/.acs/.bash_profile.acs /alma/.bash_profile
+
 # Here we create the user almamgr
 RUN  groupadd -g 1000 almamgr && \
      useradd -g 1000 -u 1000 -d /home/almamgr -m -s /bin/bash almamgr && \
@@ -127,6 +129,7 @@ RUN  groupadd -g 1000 almamgr && \
 
 # For conveniece we source the alma .bash_profile.acs in the user .bash_rc
 # and export JAVA_HOME
-RUN  echo "source /alma/ACS-2020JUN/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
-     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc
+RUN  \
+     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc && \
+     echo "source /alma/.bash_profile" >> /home/almamgr/.bashrc
 
