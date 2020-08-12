@@ -61,7 +61,6 @@ RUN yum update -y && yum install -y deltarpm  && \
      python2-pip \
      python3-pip \
      readline-devel \
-     redhat-lsb-core && \
      redhat-lsb-core \
      rpm-build \
      screen \
@@ -74,8 +73,8 @@ RUN yum update -y && yum install -y deltarpm  && \
      vim \
      wget \
      xauth \
-     xterm \
-  && yum clean all
+     xterm && \
+  yum clean all
 
 # ============= Compiler Stage ===============================================
 FROM builder AS compiler
