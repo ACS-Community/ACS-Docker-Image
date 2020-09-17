@@ -70,7 +70,7 @@ RUN yum update -y && yum install -y deltarpm && \
 # ============= Compiler Stage ===============================================
 FROM base AS dependency_builder
 
-COPY ./ /acs
+COPY acs/ /acs
 
 RUN yum -y install  \
 	curl \
@@ -86,7 +86,7 @@ RUN yum -y install  \
 	wget \
 	tree \
 	xterm && \
-	cd /acs/src/ExtProd/PRODUCTS && \
+	cd /acs/ExtProd/PRODUCTS && \
 
     ## Get missing (super old) libraries
     wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz && \
@@ -95,11 +95,9 @@ RUN yum -y install  \
     # some versions for python dependencies have changed.
     # Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
     # as we don't have the properietary version of DDS and don't use this modules.
-    # patch --verbose /acs/src/ExtProd/PRODUCTS/acs-py27.req < /acs/docker/patches/acs-py27.req.patch && \
-    # patch --verbose /acs/src/ExtProd/PRODUCTS/acs-py37.req < /acs/docker/patches/acs-py37.req.patch && \
-    sed -i 's/bulkDataNT bulkData //g' /acs/src/Makefile && \
-    cd /acs/src/ExtProd/INSTALL && \
-    source /acs/src/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+    sed -i 's/bulkDataNT bulkData //g' /acs/Makefile && \
+    cd /acs/ExtProd/INSTALL && \
+    source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make all && \
     find /alma -name "*.o" -exec rm -v {} \;
 # --------------------- Here external dependencies are built --------------
@@ -107,7 +105,7 @@ RUN yum -y install  \
 FROM dependency_builder as acs_builder
 
 RUN cd /acs/src && \
-    source /acs/src/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+    source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make build
 
 
