@@ -1,18 +1,18 @@
-FROM centos:7 AS builder
+FROM centos:7 AS base
 # ================ Builder stage =============================================
 # we base our image on a vanilla Centos 7 image.
 
-ENV ACS_PREFIX=/alma ACS_VERSION="2020.2"
+ENV ACS_PREFIX=/alma ACS_VERSION="2020.6"
 
 ENV ACS_ROOT=$ACS_PREFIX/acs
+
+ENV JAVA_HOME="/usr/java/default"
 
 # install deltarpm prior to installing everything else
 # it might save some time during downloading and installing the
 # dependencies below, but it is not urgently needed for ACS to work
 # c.f. https://www.cyberciti.biz/faq/delta-rpms-disabled-because-applydeltarpm-not-installed/
 RUN yum update -y && yum install -y deltarpm && \
-
-
 # The package list below is alphabetically sorted, so not sorted by importance.
 # It may very well be, that noe all packages are actually needed.
 # If you studied this, and found out we can shorten this list without loosing
@@ -62,14 +62,15 @@ RUN yum update -y && yum install -y deltarpm && \
                     tcl-devel \
                     tk-devel \
                     xauth && \
-    yum clean all
+    yum clean all && \
+    # Prepare Java
+    mkdir -pv /usr/java && \
+    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME
 
 # ============= Compiler Stage ===============================================
-FROM builder AS compiler
+FROM base AS dependency_builder
 
 COPY ./ /acs
-
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64
 
 RUN yum -y install  \
 	curl \
@@ -85,36 +86,37 @@ RUN yum -y install  \
 	wget \
 	tree \
 	xterm && \
-	cd /acs/ExtProd/PRODUCTS && \
+	cd /acs/src/ExtProd/PRODUCTS && \
 
     ## Get missing (super old) libraries
     wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz && \
     wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz && \
     wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.3.3.tar.gz && \
-
     # some versions for python dependencies have changed.
     # Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
     # as we don't have the properietary version of DDS and don't use this modules.
-
-    patch --verbose /acs/ExtProd/PRODUCTS/acs-py27.req < /acs/ExtProd/PRODUCTS/acs-py27.req.patch && \
-    patch --verbose /acs/ExtProd/PRODUCTS/acs-py37.req < /acs/ExtProd/PRODUCTS/acs-py37.req.patch && \
-    patch --verbose /acs/Makefile < /acs/ExtProd/PRODUCTS/Makefile.patch && \
-    cd /acs/ExtProd/INSTALL && \
-# --------------------- Here external dependencies are built --------------
-    source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+    # patch --verbose /acs/src/ExtProd/PRODUCTS/acs-py27.req < /acs/docker/patches/acs-py27.req.patch && \
+    # patch --verbose /acs/src/ExtProd/PRODUCTS/acs-py37.req < /acs/docker/patches/acs-py37.req.patch && \
+    sed -i 's/bulkDataNT bulkData //g' /acs/src/Makefile && \
+    cd /acs/src/ExtProd/INSTALL && \
+    source /acs/src/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make all && \
-    find /alma -name "*.o" -exec rm -v {} \; && \
-    cd /acs && \
-    source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-    time make
+    find /alma -name "*.o" -exec rm -v {} \;
+# --------------------- Here external dependencies are built --------------
+
+FROM dependency_builder as acs_builder
+
+RUN cd /acs/src && \
+    source /acs/src/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+    time make build
 
 
 # ============= Target image stage ===========================================
-FROM builder
+FROM base
 
 WORKDIR /
 
-COPY --from=compiler /alma /alma
+COPY --from=acs_builder /alma /alma
 
 # Here we create the user almamgr
 RUN  groupadd -g 1000 almamgr && \
@@ -122,8 +124,8 @@ RUN  groupadd -g 1000 almamgr && \
      passwd -d almamgr && \
 # For conveniece we source the alma .bash_profile.acs in the user .bash_rc
 # and export JAVA_HOME
-     echo "source /alma/ACS-2020APR/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
-     echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.7.10-4.el7_8.x86_64" >> /home/almamgr/.bashrc && \
+     echo "source /alma/ACS-2020JUN/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
+     echo "export JAVA_HOME=$JAVA_HOME" >> /home/almamgr/.bashrc && \
 
 
 # Here we make sure, that sshd is setup correctly. Using sshd is a docker anti-pattern
@@ -143,3 +145,5 @@ EXPOSE 22
 
 # As a last step we, we start the SSH daemon.
 CMD ["/usr/sbin/sshd", "-D"]
+
+USER almamgr
