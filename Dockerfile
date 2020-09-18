@@ -104,7 +104,7 @@ RUN yum -y install  \
 
 FROM dependency_builder as acs_builder
 
-RUN cd /acs/src && \
+RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make build
 
