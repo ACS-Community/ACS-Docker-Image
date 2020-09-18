@@ -37,33 +37,3 @@ So we tried to document each line in the Dockfile for you.
 
     docker run -dP --name=acs acs:2020.4
 
-# SSH into
-
-check exposed port with
-
-    docker port acs
-
-then ssh into the running container with
-
-    ssh -X -p <exposed port> almamgr@localhost
-
-# Try out things
-
-in the ssh shell try to start `acscommandcenter` like
-
-    7f1e7e9be6fa almamgr:~ 1 > acscommandcenter
-
-The containers hostname will not be exactly the same
-
-# Start/Stop the container
-
-The containers data is persistent over starts and stops. So when you are done playing with ACS:
-
-    docker stop acs
-
-And the next morning when you want to start playing around again:
-
-    docker start acs
-    docker port acs   # take note of port
-    ssh -X -p <exposed_port> almamgr@localhost
-
