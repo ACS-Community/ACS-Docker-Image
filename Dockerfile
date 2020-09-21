@@ -114,8 +114,6 @@ FROM base
 
 WORKDIR /
 
-COPY --from=acs_builder /alma /alma
-
 # Here we create the user almamgr
 RUN  groupadd -g 1000 almamgr && \
      useradd -g 1000 -u 1000 -d /home/almamgr -m -s /bin/bash almamgr && \
@@ -124,5 +122,8 @@ RUN  groupadd -g 1000 almamgr && \
 # and export JAVA_HOME
      echo "source /alma/ACS-2020JUN/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
      echo "export JAVA_HOME=$JAVA_HOME" >> /home/almamgr/.bashrc
+
+COPY --from=acs_builder --chown=almamgr /alma /alma
+
 
 USER almamgr
