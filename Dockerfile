@@ -125,5 +125,4 @@ RUN  groupadd -g 1000 almamgr && \
 
 COPY --from=acs_builder --chown=almamgr /alma /alma
 
-
 USER almamgr
