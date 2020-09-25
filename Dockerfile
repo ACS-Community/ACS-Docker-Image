@@ -2,7 +2,7 @@ FROM centos:7 AS base
 # ================ Builder stage =============================================
 # we base our image on a vanilla Centos 7 image.
 
-ENV ACS_PREFIX=/alma ACS_VERSION="2020.6"
+ENV ACS_PREFIX=/alma ACS_VERSION="2020.8"
 
 ENV ACS_ROOT=$ACS_PREFIX/acs
 
@@ -120,7 +120,7 @@ RUN  groupadd -g 1000 almamgr && \
      passwd -d almamgr && \
 # For conveniece we source the alma .bash_profile.acs in the user .bash_rc
 # and export JAVA_HOME
-     echo "source /alma/ACS-2020JUN/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
+     echo "source /alma/ACS-2020AUG/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
      echo "export JAVA_HOME=$JAVA_HOME" >> /home/almamgr/.bashrc
 
 COPY --from=acs_builder --chown=almamgr /alma /alma
