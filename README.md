@@ -38,14 +38,15 @@ In order to use this repo, you should install:
 
 
 Once you have the aforementioned prerequisites, clone the repo like this:
-
 ```
 git clone --recursive https://github.com/dneise/acs_test acs_docker
 ```
 
 NOTE: This command should **also** clone the ACS repo. If this not happen, once the ACS Docker repo is cloned, checkout the develop branch:
+(This might take a while)
 
 ```
+cd acs_docker
 git checkout develop
 ```
 
@@ -71,18 +72,23 @@ docker run --rm -it --name=acs alma/acs
 If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine:
 
 ```
-docker run --rm -it -v $PWD:/test -w /test alma/acs
+docker run --rm -it \
+   -v $PWD:/test \
+   -w /test \
+   alma/acs
 ```
 
 If you need to receive the graphical interface from the container:
 
 ```
-docker run --rm -it -u $UID -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:rw" -v $PWD:/test -w /test alma/acs
+docker run --rm -it \
+   -u $UID \
+   -e DISPLAY=$DISPLAY \
+   -v /tmp/.X11-unix:/tmp/.X11-unix:rw" \
+   -v $PWD:/test \
+   -w /test \
+   alma/acs
 ```
-
-## Built With
-
-* Docker
 
 ## Contributing
 
@@ -94,8 +100,4 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-<!---
-
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
--->
