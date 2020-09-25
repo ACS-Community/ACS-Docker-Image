@@ -69,7 +69,7 @@ docker build -t alma/acs .
 docker run --rm -it --name=acs alma/acs
 ```
 
-If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine:
+If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine into a folder called `/test` for example:
 
 ```
 docker run --rm -it \
@@ -84,7 +84,7 @@ If you need to receive the graphical interface from the container:
 docker run --rm -it \
    -u $UID \
    -e DISPLAY=$DISPLAY \
-   -v /tmp/.X11-unix:/tmp/.X11-unix:rw" \
+   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
    -v $PWD:/test \
    -w /test \
    alma/acs
