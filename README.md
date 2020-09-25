@@ -4,8 +4,6 @@ In this repo, we develop collectively a basic Dockerfile, to hopefully serve a d
  - be useful for beginners to try out ACS
  - serve as living/executable documentation
 
-[[_TOC_]]
-
 ### Releases & Images
 
 This github repository is connected to a docker.hub project at <https://hub.docker.com/repository/docker/dneise/acs_test>
