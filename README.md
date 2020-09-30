@@ -1,4 +1,4 @@
-# What is this?
+# ACS Docker
 
 In this repo, we develop collectively a basic Dockerfile, to hopefully serve a dual purpose:
  - be useful for beginners to try out ACS
@@ -26,44 +26,78 @@ would be a nice experience.
 Of course, in order to understand the Dockerfile, one might need some introduction.
 So we tried to document each line in the Dockfile for you.
 
+## Getting Started
+
+### Prerequisites
+
+In order to use this repo, you should install:
+
+* Docker : For building and run the docker image
+* git: For cloning the repo
+* git-lfs : This is needed because ACS repo keeps larger files that are served with this system. Hopefully, we will remove this in the future.
 
 
+Once you have the aforementioned prerequisites, clone the repo like this:
+```
+git clone --recursive https://github.com/dneise/acs_test acs_docker
+```
 
-# Build
+NOTE: This command should **also** clone the ACS repo. If this not happen, once the ACS Docker repo is cloned, checkout the develop branch:
+(This might take a while)
 
-    docker build . --tag=acs:2020.4
+```
+cd acs_docker
+git checkout develop
+```
 
-# Run
+And update the submodule:
 
-    docker run -dP --name=acs acs:2020.4
+```
+git submodule update --init
+```
 
-# SSH into
+### Building the docker image
 
-check exposed port with
 
-    docker port acs
+```
+docker build -t alma/acs .
+```
 
-then ssh into the running container with
+## Deployment
 
-    ssh -X -p <exposed port> almamgr@localhost
+```
+docker run --rm -it --name=acs alma/acs
+```
 
-# Try out things
+If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine into a folder called `/test` for example:
 
-in the ssh shell try to start `acscommandcenter` like
+```
+docker run --rm -it \
+   -v $PWD:/test \
+   -w /test \
+   alma/acs
+```
 
-    7f1e7e9be6fa almamgr:~ 1 > acscommandcenter
+If you need to receive the graphical interface from the container:
 
-The containers hostname will not be exactly the same
+```
+docker run --rm -it \
+   -u $UID \
+   -e DISPLAY=$DISPLAY \
+   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+   -v $PWD:/test \
+   -w /test \
+   alma/acs
+```
 
-# Start/Stop the container
+## Contributing
 
-The containers data is persistent over starts and stops. So when you are done playing with ACS:
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-    docker stop acs
+## Versioning
 
-And the next morning when you want to start playing around again:
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dneise/acs_test/tags).
 
-    docker start acs
-    docker port acs   # take note of port
-    ssh -X -p <exposed_port> almamgr@localhost
+## License
 
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
