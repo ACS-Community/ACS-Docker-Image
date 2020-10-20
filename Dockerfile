@@ -1,8 +1,8 @@
-FROM centos:7 AS base
+FROM centos:8 AS base
 # ================ Builder stage =============================================
-# we base our image on a vanilla Centos 7 image.
+# we base our image on a vanilla Centos 8 image.
 
-ENV ACS_PREFIX=/alma ACS_VERSION="2020.8"
+ENV ACS_PREFIX=/alma ACS_TAG="2020AUG" ACS_VERSION="2020.8"
 
 ENV ACS_ROOT=$ACS_PREFIX/acs
 
@@ -12,16 +12,13 @@ ENV JAVA_HOME="/usr/java/default"
 # it might save some time during downloading and installing the
 # dependencies below, but it is not urgently needed for ACS to work
 # c.f. https://www.cyberciti.biz/faq/delta-rpms-disabled-because-applydeltarpm-not-installed/
-RUN yum update -y && yum install -y deltarpm && \
 # The package list below is alphabetically sorted, so not sorted by importance.
 # It may very well be, that noe all packages are actually needed.
 # If you studied this, and found out we can shorten this list without loosing
 # the ability to execute all the ACS examples, we'd be happy to hear from you
 # either by opening an issue, or by you immediately fixing this and opening a
 # pull request.
-    yum -y install epel-release && \
-    yum -y groupinstall "Development Tools" && \
-    yum -y install  autoconf \
+RUN yum install -y  autoconf \
                     bison \
                     bzip2 \
                     bzip2-devel \
@@ -37,14 +34,11 @@ RUN yum update -y && yum install -y deltarpm && \
                     git \
                     java-11-openjdk \
                     java-11-openjdk-devel \
-                    lbzip2 \
-                    lbzip2-utils \
                     libffi \
                     libffi-devel \
                     libX11-devel \
                     libxml2-devel \
                     libxslt-devel \
-                    lockfile-progs \
                     make \
                     net-tools \
                     openldap-devel \
@@ -52,7 +46,6 @@ RUN yum update -y && yum install -y deltarpm && \
                     openssl-devel \
                     perl \
                     procmail \
-                    python-devel \
                     python2-pip \
                     python3-pip \
                     readline-devel \
@@ -79,15 +72,16 @@ RUN yum -y install  \
 	mc \
 	nc \
 	patch \
+        # Needed by buildJacOrb
+	rsync \
 	screen \
 	subversion \
+	tree \
 	unzip \
 	vim \
 	wget \
-	tree \
 	xterm && \
 	cd /acs/ExtProd/PRODUCTS && \
-
     ## Get missing (super old) libraries
     wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz && \
     wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz && \
