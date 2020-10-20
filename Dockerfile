@@ -1,4 +1,4 @@
-FROM centos:7 AS base
+FROM centos:8 AS base
 # ================ Builder stage =============================================
 # we base our image on a vanilla Centos 7 image.
 
@@ -8,18 +8,13 @@ ENV ACS_ROOT=$ACS_PREFIX/acs
 
 ENV JAVA_HOME="/usr/java/default"
 
-# install deltarpm prior to installing everything else
-# it might save some time during downloading and installing the
-# dependencies below, but it is not urgently needed for ACS to work
-# c.f. https://www.cyberciti.biz/faq/delta-rpms-disabled-because-applydeltarpm-not-installed/
-RUN yum update -y && yum install -y deltarpm && \
 # The package list below is alphabetically sorted, so not sorted by importance.
 # It may very well be, that noe all packages are actually needed.
 # If you studied this, and found out we can shorten this list without loosing
 # the ability to execute all the ACS examples, we'd be happy to hear from you
 # either by opening an issue, or by you immediately fixing this and opening a
 # pull request.
-    yum -y install epel-release && \
+RUN yum -y install epel-release && \
     yum -y groupinstall "Development Tools" && \
     yum -y install  autoconf \
                     bison \
@@ -38,13 +33,11 @@ RUN yum update -y && yum install -y deltarpm && \
                     java-11-openjdk \
                     java-11-openjdk-devel \
                     lbzip2 \
-                    lbzip2-utils \
                     libffi \
                     libffi-devel \
                     libX11-devel \
                     libxml2-devel \
                     libxslt-devel \
-                    lockfile-progs \
                     make \
                     net-tools \
                     openldap-devel \
@@ -52,8 +45,7 @@ RUN yum update -y && yum install -y deltarpm && \
                     openssl-devel \
                     perl \
                     procmail \
-                    python-devel \
-                    python2-pip \
+                    python3-devel \
                     python3-pip \
                     readline-devel \
                     redhat-lsb-core \
