@@ -2,9 +2,9 @@ FROM centos:7 AS base
 # ================ Builder stage =============================================
 # we base our image on a vanilla Centos 7 image.
 
-ENV ACS_PREFIX=/alma ACS_VERSION="2020.8"
+ENV ACS_PREFIX=/alma ACS_TAG="2020AUG" ACS_VERSION="2020.8"
 
-ENV ACS_ROOT=$ACS_PREFIX/acs
+ENV ACS_ROOT="${ACS_PREFIX}/ACS-${ACS_TAG}"
 
 ENV JAVA_HOME="/usr/java/default"
 
@@ -87,7 +87,6 @@ RUN yum -y install  \
 	tree \
 	xterm && \
 	cd /acs/ExtProd/PRODUCTS && \
-
     ## Get missing (super old) libraries
     wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz && \
     wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz && \
@@ -107,7 +106,7 @@ FROM dependency_builder as acs_builder
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make build && \
-    echo "source /alma/ACS-2020AUG/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
+    echo "source $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
 
 # ============= Target image stage ===========================================
 FROM base
