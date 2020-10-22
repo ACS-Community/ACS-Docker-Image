@@ -4,7 +4,7 @@ FROM centos:8 AS base
 
 ENV ACS_PREFIX=/alma ACS_TAG="2020AUG" ACS_VERSION="2020.8"
 
-ENV ACS_ROOT=$ACS_PREFIX/acs
+ENV ACS_ROOT="${ACS_PREFIX}/ACS-${ACS_TAG}"
 
 ENV JAVA_HOME="/usr/java/default"
 
@@ -101,7 +101,7 @@ FROM dependency_builder as acs_builder
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make build && \
-    echo "source /alma/ACS-2020AUG/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
+    echo "source $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
 
 # ============= Target image stage ===========================================
 FROM base
