@@ -106,23 +106,12 @@ FROM dependency_builder as acs_builder
 
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-    time make build
-
+    time make build && \
+    echo "source /alma/ACS-2020AUG/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
 
 # ============= Target image stage ===========================================
 FROM base
 
 WORKDIR /
 
-# Here we create the user almamgr
-RUN  groupadd -g 1000 almamgr && \
-     useradd -g 1000 -u 1000 -d /home/almamgr -m -s /bin/bash almamgr && \
-     passwd -d almamgr && \
-# For conveniece we source the alma .bash_profile.acs in the user .bash_rc
-# and export JAVA_HOME
-     echo "source /alma/ACS-2020AUG/ACSSW/config/.acs/.bash_profile.acs" >> /home/almamgr/.bashrc && \
-     echo "export JAVA_HOME=$JAVA_HOME" >> /home/almamgr/.bashrc
-
-COPY --from=acs_builder --chown=almamgr /alma /alma
-
-USER almamgr
+COPY --from=acs_builder /alma /alma
