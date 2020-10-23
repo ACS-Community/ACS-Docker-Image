@@ -65,7 +65,8 @@ RUN yum update -y && yum install -y deltarpm && \
     yum clean all && \
     # Prepare Java
     mkdir -pv /usr/java && \
-    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME
+    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME && \
+    echo "source $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
 
 # ============= Compiler Stage ===============================================
 FROM base AS dependency_builder
@@ -105,8 +106,7 @@ FROM dependency_builder as acs_builder
 
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-    time make build && \
-    echo "source $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
+    time make build
 
 # ============= Target image stage ===========================================
 FROM base
