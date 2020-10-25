@@ -8,10 +8,6 @@ ENV ACS_ROOT="${ACS_PREFIX}/ACS-${ACS_TAG}"
 
 ENV JAVA_HOME="/usr/java/default"
 
-# install deltarpm prior to installing everything else
-# it might save some time during downloading and installing the
-# dependencies below, but it is not urgently needed for ACS to work
-# c.f. https://www.cyberciti.biz/faq/delta-rpms-disabled-because-applydeltarpm-not-installed/
 # The package list below is alphabetically sorted, so not sorted by importance.
 # It may very well be, that noe all packages are actually needed.
 # If you studied this, and found out we can shorten this list without loosing
