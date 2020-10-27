@@ -62,7 +62,7 @@ If you want to build the same version, we build just do:
 ```
 docker build \
     -t acscommunity/acs:$ACS_DOCKER_VERSION \
-    --build-arg ACS_VERSION_NAME=$ACS_VERSION_NAME \
+    --build-arg ACS_TAG=$ACS_TAG \
     --build-arg ACS_VERSION=$ACS_VERSION \
     .
 ```
