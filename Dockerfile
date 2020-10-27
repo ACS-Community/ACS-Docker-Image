@@ -2,8 +2,13 @@ FROM centos:8 AS base
 # ================ Builder stage =============================================
 # we base our image on a vanilla Centos 8 image.
 
-ENV ACS_PREFIX=/alma ACS_TAG="2020AUG" ACS_VERSION="2020.8"
+ARG ACS_VERSION="2020.8"
+ENV ACS_VERSION=$ACS_VERSION
 
+ARG ACS_TAG="2020AUG"
+ENV ACS_TAG=$ACS_TAG
+
+ENV ACS_PREFIX=/alma
 ENV ACS_ROOT="${ACS_PREFIX}/ACS-${ACS_TAG}"
 
 ENV JAVA_HOME="/usr/java/default"

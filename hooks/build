@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -u
+
+source ./VERSION
+: "$ACS_VERSION_NAME"
+
+
+docker build \
+    --build-arg ACS_VERSION_NAME=$ACS_VERSION_NAME \
+    --build-arg ACS_VERSION=$ACS_VERSION \
+    -f $DOCKERFILE_PATH \
+    -t $IMAGE_NAME .

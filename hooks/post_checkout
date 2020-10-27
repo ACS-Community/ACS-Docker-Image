@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source VERSION
+
+./download_and_install_git_lfs.sh
+
+./git_clone_acs.sh

@@ -30,43 +30,52 @@ So we tried to document each line in the Dockfile for you.
 
 ### Prerequisites
 
-In order to use this repo, you should install:
+```
+git clone https://github.com/ACS-Community/ACS-Docker-Image
+cd ACS-Docker-Image
+```
+
+In order to use this repo, you should have installed:
 
 * Docker : For building and run the docker image
-* git: For cloning the repo
 * git-lfs : This is needed because ACS repo keeps larger files that are served with this system. Hopefully, we will remove this in the future.
 
-
-Once you have the aforementioned prerequisites, clone the repo like this:
+In order to define which version of ACS we are going to build, just `source`
+the file: `VERSION` (or `export` the variables as you like):
 ```
-git clone --recursive https://github.com/dneise/acs_test acs_docker
-```
-
-NOTE: This command should **also** clone the ACS repo. If this not happen, once the ACS Docker repo is cloned, checkout the develop branch:
-(This might take a while)
-
-```
-cd acs_docker
-git checkout develop
+source ./VERSION
 ```
 
-And update the submodule:
-
+If git-lfs is not yet installed:
 ```
-git submodule update --init
+./download_and_install_git_lfs.sh
+```
+
+Now git clone the version of ACS you want ot build.
+If you want to build the same version, we build just do:
+```
+./git_clone_acs.sh
 ```
 
 ### Building the docker image
 
+```
+docker build \
+    -t acscommunity/acs:$ACS_DOCKER_VERSION \
+    --build-arg ACS_VERSION_NAME=$ACS_VERSION_NAME \
+    --build-arg ACS_VERSION=$ACS_VERSION \
+    .
+```
+or just
+```
+./hooks/build
+```
 
-```
-docker build -t alma/acs .
-```
 
 ## Deployment
 
 ```
-docker run --rm -it --name=acs alma/acs
+docker run --rm -it --name=acs acscommunity/acs:$ACS_DOCKER_VERSION
 ```
 
 If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine into a folder called `/test` for example:
@@ -75,7 +84,7 @@ If you want to compile your ACS module inside the docker container, create a doc
 docker run --rm -it \
    -v $PWD:/test \
    -w /test \
-   alma/acs
+   acscommunity/acs:$ACS_DOCKER_VERSION
 ```
 
 If you need to receive the graphical interface from the container:
@@ -87,7 +96,7 @@ docker run --rm -it \
    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
    -v $PWD:/test \
    -w /test \
-   alma/acs
+   acscommunity/acs:$ACS_DOCKER_VERSION
 ```
 
 ## Contributing
