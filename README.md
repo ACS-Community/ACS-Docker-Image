@@ -40,11 +40,8 @@ In order to use this repo, you should have installed:
 * Docker : For building and run the docker image
 * git-lfs : This is needed because ACS repo keeps larger files that are served with this system. Hopefully, we will remove this in the future.
 
-In order to define which version of ACS we are going to build, just `source`
-the file: `VERSION` (or `export` the variables as you like):
-```
-source ./VERSION
-```
+In order to define which version of ACS we are going to build, please adjust
+the contents of the `VERSION` file as you wish.
 
 If git-lfs is not yet installed:
 ```
@@ -68,7 +65,7 @@ docker build \
 ```
 or just
 ```
-./hooks/build
+IMAGE_NAME=acscommunity/acs:latest ./hooks/build
 ```
 
 

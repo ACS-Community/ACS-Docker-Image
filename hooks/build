@@ -10,5 +10,4 @@ source ./VERSION
 docker build \
     --build-arg ACS_TAG=$ACS_TAG \
     --build-arg ACS_VERSION=$ACS_VERSION \
-    -f $DOCKERFILE_PATH \
     -t $IMAGE_NAME .

@@ -5,6 +5,7 @@
 #
 # script fails if $ACS_TAG is not defined.
 # script expects git lfs to be installed
+source ./VERSION
 
 set -u # aborts automatically if we try to expand an undefined variable
 : "$ACS_TAG"  # tries to expand variable in a no-op context.
