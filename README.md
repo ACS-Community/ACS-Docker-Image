@@ -61,7 +61,7 @@ If you want to build the same version, we build just do:
 
 ```
 docker build \
-    -t acscommunity/acs:$ACS_DOCKER_VERSION \
+    -t acscommunity/acs \
     --build-arg ACS_TAG=$ACS_TAG \
     --build-arg ACS_VERSION=$ACS_VERSION \
     .
@@ -75,7 +75,7 @@ or just
 ## Deployment
 
 ```
-docker run --rm -it --name=acs acscommunity/acs:$ACS_DOCKER_VERSION
+docker run --rm -it --name=acs acscommunity/acs
 ```
 
 If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine into a folder called `/test` for example:
@@ -84,7 +84,7 @@ If you want to compile your ACS module inside the docker container, create a doc
 docker run --rm -it \
    -v $PWD:/test \
    -w /test \
-   acscommunity/acs:$ACS_DOCKER_VERSION
+   acscommunity/acs
 ```
 
 If you need to receive the graphical interface from the container:
@@ -96,7 +96,7 @@ docker run --rm -it \
    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
    -v $PWD:/test \
    -w /test \
-   acscommunity/acs:$ACS_DOCKER_VERSION
+   acscommunity/acs
 ```
 
 ## Contributing
