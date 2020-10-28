@@ -59,8 +59,7 @@ RUN yum install -y  autoconf \
     yum clean all && \
     # Prepare Java
     mkdir -pv /usr/java && \
-    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME && \
-    echo "source $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
+    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME
 
 # ============= Compiler Stage ===============================================
 FROM base AS dependency_builder
@@ -110,3 +109,5 @@ FROM base
 WORKDIR /
 
 COPY --from=acs_builder /alma /alma
+
+RUN ln -sv $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs /alma
