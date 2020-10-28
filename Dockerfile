@@ -94,7 +94,7 @@ RUN yum -y install  \
     cd /acs/ExtProd/INSTALL && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make all && \
-    find /alma -name "*.o" -exec rm -v {} \;
+    find /alma -name "*.o" -exec rm {} \;
 # --------------------- Here external dependencies are built --------------
 
 FROM dependency_builder as acs_builder
