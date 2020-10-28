@@ -2,8 +2,13 @@ FROM centos:8 AS base
 # ================ Builder stage =============================================
 # we base our image on a vanilla Centos 8 image.
 
-ENV ACS_PREFIX=/alma ACS_TAG="2020AUG" ACS_VERSION="2020.8"
+ARG ACS_VERSION="2020.8"
+ENV ACS_VERSION=$ACS_VERSION
 
+ARG ACS_TAG="2020AUG"
+ENV ACS_TAG=$ACS_TAG
+
+ENV ACS_PREFIX=/alma
 ENV ACS_ROOT="${ACS_PREFIX}/ACS-${ACS_TAG}"
 
 ENV JAVA_HOME="/usr/java/default"
@@ -54,8 +59,7 @@ RUN yum install -y  autoconf \
     yum clean all && \
     # Prepare Java
     mkdir -pv /usr/java && \
-    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME && \
-    echo "source $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs" >> /etc/bashrc
+    ln -sv /usr/lib/jvm/java-openjdk $JAVA_HOME
 
 # ============= Compiler Stage ===============================================
 FROM base AS dependency_builder
@@ -90,7 +94,7 @@ RUN yum -y install  \
     cd /acs/ExtProd/INSTALL && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time make all && \
-    find /alma -name "*.o" -exec rm -v {} \;
+    find /alma -name "*.o" -exec rm {} \;
 # --------------------- Here external dependencies are built --------------
 
 FROM dependency_builder as acs_builder
@@ -105,3 +109,5 @@ FROM base
 WORKDIR /
 
 COPY --from=acs_builder /alma /alma
+
+RUN ln -sv $ACS_ROOT/ACSSW/config/.acs/.bash_profile.acs /alma

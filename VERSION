@@ -1,0 +1,5 @@
+# source this file before starting the build
+
+# Used inside Dockerfile & git_clone_acs.sh
+ACS_TAG=2020AUG
+ACS_VERSION=2020.8

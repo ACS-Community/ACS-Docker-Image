@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -u
+
+source ./VERSION
+: "$ACS_TAG"
+: "$ACS_VERSION"
+
+
+docker build \
+    --build-arg ACS_TAG=$ACS_TAG \
+    --build-arg ACS_VERSION=$ACS_VERSION \
+    -t $IMAGE_NAME .
