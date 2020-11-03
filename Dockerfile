@@ -93,8 +93,8 @@ FROM dependency_builder as acs_builder
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
     time OPTIMIZE=3 MAKE_PARS="-j $(nproc)" make build && \
-    find $ACS_ROOT -name "*.o" -exec rm -v {} \; && \
-    find $ACS_ROOT -type f -executable |grep -v "/pyenv/" | xargs file | grep ELF | awk '{print $1}' | tr -d ':' | xargs strip --strip-unneeded --verbose
+    find $ACS_ROOT -name "*.o" -exec rm {} \; && \
+    find $ACS_ROOT -type f -executable |grep -v "/pyenv/" | xargs file | grep ELF | awk '{print $1}' | tr -d ':' | xargs strip --strip-unneeded
 # ============= Target image stage ===========================================
 FROM base
 
