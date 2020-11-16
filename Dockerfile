@@ -14,7 +14,7 @@ ENV JAVA_HOME="/usr/java/default"
 # the ability to execute all the ACS examples, we'd be happy to hear from you
 # either by opening an issue, or by you immediately fixing this and opening a
 # pull request.
-RUN yum install -y  autoconf \
+RUN yum install -y  \
                     bison \
                     bzip2 \
                     bzip2-devel \
@@ -38,7 +38,6 @@ RUN yum install -y  autoconf \
                     make \
                     net-tools \
                     openldap-devel \
-                    openssh-server \
                     openssl-devel \
                     perl \
                     procmail \
@@ -62,43 +61,40 @@ FROM base AS dependency_builder
 
 COPY acs/ /acs
 
-RUN yum -y install  \
-	curl \
-	git-lfs \
-	ksh \
-	mc \
-	nc \
-	patch \
-        # Needed by buildJacOrb
-	rsync \
-	screen \
-	subversion \
-	tree \
-	unzip \
-	vim \
-	wget \
-	xterm && \
-	cd /acs/ExtProd/PRODUCTS && \
-    ## Get missing (super old) libraries
-    wget https://sourceforge.net/projects/gnuplot-py/files/Gnuplot-py/1.8/gnuplot-py-1.8.tar.gz/download -O gnuplot-py-1.8.tar.gz && \
-    wget https://sourceforge.net/projects/pychecker/files/pychecker/0.8.17/pychecker-0.8.17.tar.gz/download -O pychecker-0.8.17.tar.gz && \
-    wget https://sourceforge.net/projects/numpy/files/OldFiles/1.3.3/numarray-1.3.3.tar.gz && \
-    # some versions for python dependencies have changed.
-    # Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
-    # as we don't have the properietary version of DDS and don't use this modules.
-    sed -i 's/bulkDataNT bulkData //g' /acs/Makefile && \
-    cd /acs/ExtProd/INSTALL && \
-    source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-    time make all && \
-    find /alma -name "*.o" -exec rm -v {} \;
+RUN yum -y install  autoconf \
+                    curl \
+                    git-lfs \
+                    ksh \
+                    mc \
+                    nc \
+                    patch \
+                    # Needed by buildJacOrb
+                    rsync \
+                    screen \
+                    subversion \
+                    tree \
+                    unzip \
+                    vim \
+                    wget \
+                    xterm && \
+                    cd /acs/ExtProd/PRODUCTS && \
+                    # some versions for python dependencies have changed.
+                    # Also we removed the *bulkDataNT* and *bulkData* modules from the Makefile
+                    # as we don't have the properietary version of DDS and don't use this modules.
+                    sed -i 's/bulkDataNT bulkData //g' /acs/Makefile && \
+                    cd /acs/ExtProd/INSTALL && \
+                    source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
+                    time OPTIMIZE=3 make all && \
+                    find /alma -name "*.o" -exec rm -v {} \;
 # --------------------- Here external dependencies are built --------------
 
 FROM dependency_builder as acs_builder
 
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-    time make build
-
+    time OPTIMIZE=3 MAKE_PARS="-j $(nproc)" make build && \
+    find $ACS_ROOT -name "*.o" -exec rm {} \; && \
+    find $ACS_ROOT -type f -executable |grep -v "/pyenv/" | xargs file | grep ELF | awk '{print $1}' | tr -d ':' | xargs strip --strip-unneeded
 # ============= Target image stage ===========================================
 FROM base
 
