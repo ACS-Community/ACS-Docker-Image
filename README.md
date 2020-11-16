@@ -58,15 +58,22 @@ git submodule update --init
 
 ### Building the docker image
 
+#### Centos 7
 
 ```
-docker build -t alma/acs .
+docker build -t acscommunity/acs:2020.08.0-centos7-latest -t acscommunity/acs:2020.08.0-centos7 -f centos-7.Dockerfile .
+```
+
+#### Centos 8
+
+```
+docker build -t acscommunity/acs -f centos-8.Dockerfile .
 ```
 
 ## Deployment
 
 ```
-docker run --rm -it --name=acs alma/acs
+docker run --rm -it --name=acs acscommunity/acs
 ```
 
 If you want to compile your ACS module inside the docker container, create a docker volume that binds the path of your machine into a folder called `/test` for example:
@@ -75,7 +82,7 @@ If you want to compile your ACS module inside the docker container, create a doc
 docker run --rm -it \
    -v $PWD:/test \
    -w /test \
-   alma/acs
+   acscommunity/acs
 ```
 
 If you need to receive the graphical interface from the container:
@@ -87,7 +94,7 @@ docker run --rm -it \
    -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
    -v $PWD:/test \
    -w /test \
-   alma/acs
+   acscommunity/acs
 ```
 
 ## Contributing
