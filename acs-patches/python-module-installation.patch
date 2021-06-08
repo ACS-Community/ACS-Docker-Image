@@ -1,0 +1,37 @@
+--- a/ExtProd/INSTALL/buildPyModules
++++ b/ExtProd/INSTALL/buildPyModules
+@@ -53,6 +53,8 @@ exec > $LOG 2>&1
+ 
+ date
+ 
++PIP_VER=20.1.1
++
+ if [ ! -d $PYTHON_ROOT ]
+ then
+   echo "$PYTHON_ROOT not found, cannot continue..."
+@@ -92,10 +94,12 @@ fi
+ cd ../PRODUCTS
+ 
+ eval "$(pyenv init -)"
++pip2 install --upgrade pip==$PIP_VER
+ pip2 install --force-reinstall -r acs-py27.req.0 || { echo "FAILED: Installing Python 2 ACS Requirements (req.0)" && exit 1; }
+ pip2 install --force-reinstall -r acs-py27.req || { echo "FAILED: Installing Python 2 ACS Requirements (req)" && exit 1; }
+ patch -p1 -d $(pip2 show PyXB |grep Location |awk '{print $2}')/pyxb < ../PRODUCTS/pyxb.patch || { echo "Failed to apply patch for PyXB in Python 2" && exit 1; }
+ 
++pip3 install --upgrade pip==$PIP_VER
+ pip3 install --force-reinstall -r acs-py37.req.0 || { echo "FAILED: Installing Python 3 ACS Requirements (req.0)" && exit 1; }
+ pip3 install --force-reinstall -r acs-py37.req || { echo "FAILED: Installing Python 3 ACS Requirements (req)" && exit 1; }
+ patch -p1 -d $(pip3 show PyXB |grep Location |awk '{print $2}')/pyxb < ../PRODUCTS/pyxb.patch || { echo "Failed to apply patch for PyXB in Python 3" && exit 1; }
+
+--- a/ExtProd/INSTALL/buildPython
++++ b/ExtProd/INSTALL/buildPython
+@@ -62,7 +62,9 @@ exec > $LOG 2>&1
+ 
+ date
+ 
++PYENV_VER=v1.2.21
+ git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT || (echo "FAILED: Cloning pyenv repository." && exit 1)
++cd $PYENV_ROOT && git checkout tags/$PYENV_VER -b pyenv-acs && cd - || (echo "FAILED: Checkout of $PYENV_VER tag version." && exit 1)
+ eval "$(pyenv init -)" || (echo "FAILED: Initializing pyenv environment." && exit 1)
+ PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f 2.7.16 || (echo "FAILED: Installing Python 2.7.16." && exit 1)
+ PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install -f 3.6.9 || (echo "FAILED: Installing Python 3.6.9." && exit 1)
