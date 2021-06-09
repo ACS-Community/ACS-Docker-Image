@@ -1,6 +1,4 @@
 FROM centos:7 AS base
-# ================ Builder stage =============================================
-# we base our image on a vanilla Centos 8 image.
 
 ENV ACS_PREFIX=/alma ACS_TAG="2020AUG" ACS_VERSION="2020.8"
 
@@ -61,6 +59,7 @@ FROM base AS dependency_builder
 
 COPY acs/ /acs
 
+COPY acs-patches/ /tmp
 RUN yum -y install  autoconf \
                     curl \
                     git-lfs \
@@ -83,8 +82,9 @@ RUN yum -y install  autoconf \
                     # as we don't have the properietary version of DDS and don't use this modules.
                     sed -i 's/bulkDataNT bulkData //g' /acs/Makefile && \
                     cd /acs/ExtProd/INSTALL && \
+                    patch -p1 -d /acs < /tmp/python-module-installation.patch && \
                     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-                    time OPTIMIZE=3 make all && \
+                    time MAKE_NOSTATIC=1 OPTIMIZE=3 make -C /acs/ExtProd/INSTALL all && \
                     find /alma -name "*.o" -exec rm -v {} \;
 # --------------------- Here external dependencies are built --------------
 
@@ -92,7 +92,7 @@ FROM dependency_builder as acs_builder
 
 RUN cd /acs/ && \
     source /acs/LGPL/acsBUILD/config/.acs/.bash_profile.acs && \
-    time OPTIMIZE=3 MAKE_PARS="-j $(nproc)" make build && \
+    time MAKE_NOSTATIC=1 OPTIMIZE=3 MAKE_PARS="-j $(nproc)" make build && \
     find $ACS_ROOT -name "*.o" -exec rm {} \; && \
     find $ACS_ROOT -type f -executable |grep -v "/pyenv/" | xargs file | grep ELF | awk '{print $1}' | tr -d ':' | xargs strip --strip-unneeded
 # ============= Target image stage ===========================================
